@@ -1,9 +1,9 @@
 name: MaskFS Build
 
 on:
-  tag:
-    branches:
-      - master
+  push:
+    tags:
+      - 'v*.*.*'
 
 jobs:
   build-linux32:
