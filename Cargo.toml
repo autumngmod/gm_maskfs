@@ -1,0 +1,13 @@
+[package]
+name = "gm_maskfs"
+description = "Bypass Garry's Mod file system restrictions"
+authors=["smokingplaya"]
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+anyhow = "1.0.97"
+rglua = "3.0.0"
