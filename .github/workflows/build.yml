@@ -1,7 +1,7 @@
 name: MaskFS Build
 
 on:
-  push:
+  tag:
     branches:
       - master
 
