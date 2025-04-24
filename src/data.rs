@@ -54,7 +54,7 @@ fn add_file(lua: &LuaState, entry: &Path, save_path: &Path) -> Result<()> {
       .replace("\\", "/");
 
     let c_path = CString::new(path_str)?;
-    resource::add_single_file(lua.clone(), c_path.as_ptr());
+    resource::add_single_file(*lua, c_path.as_ptr());
   }
 
   Ok(())
@@ -65,17 +65,17 @@ pub fn scan(lua: LuaState) -> Result<()> {
   let save_dir = Path::new("garrysmod/resource/shared");
 
   if !base_dir.exists() {
-    fs::create_dir_all(&base_dir)
+    fs::create_dir_all(base_dir)
       .with_context(|| format!("Unable to create base directory: {:?}", base_dir))?;
     return Ok(());
   }
 
-  for entry in fs::read_dir(&base_dir)
+  for entry in fs::read_dir(base_dir)
     .with_context(|| format!("Failed to read base directory {:?}", base_dir))?
   {
     let entry = entry?;
     let path = entry.path();
-    let rel_path = path.strip_prefix(&base_dir)
+    let rel_path = path.strip_prefix(base_dir)
       .with_context(|| format!("Failed to get relative path for {:?}", path))?;
     let target_path = save_dir.join(rel_path);
     add_file(&lua, &path, &target_path)?;
