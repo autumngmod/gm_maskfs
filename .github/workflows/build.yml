@@ -12,6 +12,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Install 32-bit dependencies
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y gcc-multilib g++-multilib libc6-dev-i386
+
       - name: Install Rust toolchain
         run: |
           rustup install nightly
