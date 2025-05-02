@@ -6,22 +6,9 @@ on:
       - 'v*.*.*'
 
 jobs:
-  build-and-release:
-    name: Build and Release
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        target:
-          - { os: ubuntu-latest, target: i686-unknown-linux-gnu, artifact: libgm_maskfs.so }
-          - { os: ubuntu-latest, target: x86_64-unknown-linux-gnu, artifact: libgm_maskfs.so }
-          - { os: windows-latest, target: i686-pc-windows-msvc, artifact: gm_maskfs.dll }
-          - { os: windows-latest, target: x86_64-pc-windows-msvc, artifact: gm_maskfs.dll }
-        include:
-          - { os: ubuntu-latest, target: i686-unknown-linux-gnu, artifact: libgm_maskfs.so, name: gmsv_gm_maskfs_linux.dll }
-          - { os: ubuntu-latest, target: x86_64-unknown-linux-gnu, artifact: libgm_maskfs.so, name: gmsv_gm_maskfs_linux64.dll }
-          - { os: windows-latest, target: i686-pc-windows-msvc, artifact: gm_maskfs.dll, name: gmsv_gm_maskfs_win32.dll }
-          - { os: windows-latest, target: x86_64-pc-windows-msvc, artifact: gm_maskfs.dll, name: gmsv_gm_maskfs_win64.dll }
+  build-linux32:
+    name: Build Linux x32
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
@@ -29,16 +16,88 @@ jobs:
         run: |
           rustup install nightly
           rustup default nightly
-          rustup target add ${{ matrix.target.target }}
+          rustup target add i686-unknown-linux-gnu
 
       - name: Build
-        run: cargo build --release --target ${{ matrix.target.target }}
+        run: cargo build --release --target i686-unknown-linux-gnu
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v1
         with:
-          files: target/${{ matrix.target.target }}/release/${{ matrix.target.artifact }}
+          files: target/i686-unknown-linux-gnu/release/libgm_maskfs.so
           tag_name: ${{ github.ref }}
-          name: ${{ matrix.target.name }}
+          name: gmsv_gm_maskfs_linux.dll
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-linux64:
+    name: Build Linux x64
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Rust toolchain
+        run: |
+          rustup install nightly
+          rustup default nightly
+          rustup target add x86_64-unknown-linux-gnu
+
+      - name: Build
+        run: cargo build --release --target x86_64-unknown-linux-gnu
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: target/x86_64-unknown-linux-gnu/release/libgm_maskfs.so
+          tag_name: ${{ github.ref }}
+          name: gmsv_gm_maskfs_linux64.dll
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-win32:
+    name: Build Windows x32
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Rust toolchain
+        run: |
+          rustup install nightly
+          rustup default nightly
+          rustup target add i686-pc-windows-msvc
+
+      - name: Build
+        run: cargo build --release --target i686-pc-windows-msvc
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: target/i686-pc-windows-msvc/release/gm_maskfs.dll
+          tag_name: ${{ github.ref }}
+          name: gmsv_gm_maskfs_win32.dll
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-win64:
+    name: Build Windows x64
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Rust toolchain
+        run: |
+          rustup install nightly
+          rustup default nightly
+          rustup target add x86_64-pc-windows-msvc
+
+      - name: Build
+        run: cargo build --release --target x86_64-pc-windows-msvc
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: target/x86_64-pc-windows-msvc/release/gm_maskfs.dll
+          tag_name: ${{ github.ref }}
+          name: gmsv_gm_maskfs_win64.dll
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
