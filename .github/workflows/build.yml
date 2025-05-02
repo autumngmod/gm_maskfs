@@ -1,4 +1,4 @@
-name: MaskFS Build
+name: MaskFS Build and Release
 
 on:
   push:
@@ -6,82 +6,39 @@ on:
       - 'v*.*.*'
 
 jobs:
-  build-linux32:
-    name: Build Linux x32
-    runs-on: ubuntu-latest
-    env:
-      TARGET: i686-unknown-linux-gnu
+  build-and-release:
+    name: Build and Release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        target:
+          - { os: ubuntu-latest, target: i686-unknown-linux-gnu, artifact: libgm_maskfs.so }
+          - { os: ubuntu-latest, target: x86_64-unknown-linux-gnu, artifact: libgm_maskfs.so }
+          - { os: windows-latest, target: i686-pc-windows-msvc, artifact: gm_maskfs.dll }
+          - { os: windows-latest, target: x86_64-pc-windows-msvc, artifact: gm_maskfs.dll }
+        include:
+          - { os: ubuntu-latest, target: i686-unknown-linux-gnu, artifact: libgm_maskfs.so, name: gmsv_gm_maskfs_linux.dll }
+          - { os: ubuntu-latest, target: x86_64-unknown-linux-gnu, artifact: libgm_maskfs.so, name: gmsv_gm_maskfs_linux64.dll }
+          - { os: windows-latest, target: i686-pc-windows-msvc, artifact: gm_maskfs.dll, name: gmsv_gm_maskfs_win32.dll }
+          - { os: windows-latest, target: x86_64-pc-windows-msvc, artifact: gm_maskfs.dll, name: gmsv_gm_maskfs_win64.dll }
     steps:
-    - uses: actions/checkout@v2
-    - run: |
-        rustup install nightly
-        rustup default nightly
-    - uses: actions-rs/toolchain@v1
-      with:
-        profile: default
-        toolchain: nightly
-    - run: cargo build --release
-    - uses: actions/upload-artifact@v4
-      with:
-        name: gmsv_gm_maskfs_linux.dll
-        path: target/release/libgm_maskfs.so
+      - uses: actions/checkout@v2
 
-  build-linux64:
-    name: Build Linux x64
-    runs-on: ubuntu-latest
-    env:
-      TARGET: x86_64-unknown-linux-gnu
-    steps:
-    - uses: actions/checkout@v2
-    - run: |
-        rustup install nightly
-        rustup default nightly
-    - uses: actions-rs/toolchain@v1
-      with:
-        profile: default
-        toolchain: nightly
-    - run: cargo build --release
-    - uses: actions/upload-artifact@v4
-      with:
-        name: gmsv_gm_maskfs_linux64.dll
-        path: target/release/libgm_maskfs.so
+      - name: Install Rust toolchain
+        run: |
+          rustup install nightly
+          rustup default nightly
+          rustup target add ${{ matrix.target.target }}
 
-  build-win64:
-    name: Build Windows x64
-    runs-on: windows-latest
-    env:
-      TARGET: x86_64-pc-windows-msvc
-    steps:
-    - uses: actions/checkout@v2
-    - run: |
-        rustup install nightly
-        rustup default nightly
-    - uses: actions-rs/toolchain@v1
-      with:
-        profile: default
-        toolchain: nightly
-    - run: cargo build --release
-    - uses: actions/upload-artifact@v4
-      with:
-        name: gmsv_gm_maskfs_win64.dll
-        path: target/release/gm_maskfs.dll
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target.target }}
 
-  build-win32:
-    name: Build Windows x32
-    runs-on: windows-latest
-    env:
-      TARGET: i686-pc-windows-msvc
-    steps:
-    - uses: actions/checkout@v2
-    - run: |
-        rustup install nightly
-        rustup default nightly
-    - uses: actions-rs/toolchain@v1
-      with:
-        profile: default
-        toolchain: nightly
-    - run: cargo build --release
-    - uses: actions/upload-artifact@v4
-      with:
-        name: gmsv_gm_maskfs_win32.dll
-        path: target/release/gm_maskfs.dll
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: target/${{ matrix.target.target }}/release/${{ matrix.target.artifact }}
+          tag_name: ${{ github.ref }}
+          name: ${{ matrix.target.name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
