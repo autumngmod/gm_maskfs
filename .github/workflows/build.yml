@@ -32,10 +32,10 @@ jobs:
         run: cargo build --release --target i686-unknown-linux-gnu
 
       - name: Upload Release Asset
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: target/i686-unknown-linux-gnu/release/libgm_maskfs.so
-          tag_name: ${{ github.ref }}
+          tag_name: ${{ github.ref_name }}
           name: gmsv_gm_maskfs_linux.dll
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
