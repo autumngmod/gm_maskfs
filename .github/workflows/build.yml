@@ -3,17 +3,25 @@ name: MaskFS Build and Release
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag name (example: v1.2.3)"
+        required: true
 
 permissions:
   contents: write
+
+env:
+  TAG_NAME: ${{ github.event.inputs.tag || github.ref_name }}
 
 jobs:
   build-linux32:
     name: Build Linux x32
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Install 32-bit dependencies
         run: |
@@ -24,18 +32,20 @@ jobs:
       - name: Install Rust toolchain
         run: |
           rustup install nightly
-          rustup default nightly
           rustup target add i686-unknown-linux-gnu
 
       - name: Build
         run: cargo build --release --target i686-unknown-linux-gnu
 
+      - name: Rename file
+        run: |
+          cp target/i686-unknown-linux-gnu/release/libgm_maskfs.so gmsv_maskfs_linux.dll
+
       - name: Upload Release Asset
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
-          files: target/i686-unknown-linux-gnu/release/libgm_maskfs.so
-          tag_name: ${{ github.ref }}
-          name: gmsv_gm_maskfs_linux.dll
+          files: gmsv_maskfs_linux.dll
+          tag_name: ${{ env.TAG_NAME }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -43,23 +53,25 @@ jobs:
     name: Build Linux x64
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Install Rust toolchain
         run: |
           rustup install nightly
-          rustup default nightly
           rustup target add x86_64-unknown-linux-gnu
 
       - name: Build
         run: cargo build --release --target x86_64-unknown-linux-gnu
 
+      - name: Rename file
+        run: |
+          cp target/x86_64-unknown-linux-gnu/release/libgm_maskfs.so gmsv_maskfs_linux64.dll
+
       - name: Upload Release Asset
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
-          files: target/x86_64-unknown-linux-gnu/release/libgm_maskfs.so
-          tag_name: ${{ github.ref }}
-          name: gmsv_gm_maskfs_linux64.dll
+          files: gmsv_maskfs_linux64.dll
+          tag_name: ${{ env.TAG_NAME }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -67,23 +79,25 @@ jobs:
     name: Build Windows x32
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Install Rust toolchain
         run: |
           rustup install nightly
-          rustup default nightly
           rustup target add i686-pc-windows-msvc
 
       - name: Build
         run: cargo build --release --target i686-pc-windows-msvc
 
+      - name: Rename file
+        run: |
+          copy target\i686-pc-windows-msvc\release\gm_maskfs.dll gmsv_maskfs_win32.dll
+
       - name: Upload Release Asset
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
-          files: target/i686-pc-windows-msvc/release/gm_maskfs.dll
-          tag_name: ${{ github.ref }}
-          name: gmsv_gm_maskfs_win32.dll
+          files: gmsv_maskfs_win32.dll
+          tag_name: ${{ env.TAG_NAME }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -91,22 +105,24 @@ jobs:
     name: Build Windows x64
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Install Rust toolchain
         run: |
           rustup install nightly
-          rustup default nightly
           rustup target add x86_64-pc-windows-msvc
 
       - name: Build
         run: cargo build --release --target x86_64-pc-windows-msvc
 
+      - name: Rename file
+        run: |
+          copy target\x86_64-pc-windows-msvc\release\gm_maskfs.dll gmsv_maskfs_win64.dll
+
       - name: Upload Release Asset
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
-          files: target/x86_64-pc-windows-msvc/release/gm_maskfs.dll
-          tag_name: ${{ github.ref }}
-          name: gmsv_gm_maskfs_win64.dll
+          files: gmsv_maskfs_win64.dll
+          tag_name: ${{ env.TAG_NAME }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
