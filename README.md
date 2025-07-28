@@ -11,10 +11,10 @@
 
 | Architecture | Download |
 |--------------|----------|
-| Windows x32  | [Download](https://github.com/autumngmod/gm_maskfs/releases/latest/download/gmsv_gm_maskfs_win32.dll) |
-| Windows x64  | [Download](https://github.com/autumngmod/gm_maskfs/releases/latest/download/gmsv_gm_maskfs_win64.dll) |
-| Linux x32    | [Download](https://github.com/autumngmod/gm_maskfs/releases/latest/download/gmsv_gm_maskfs_linux.dll) |
-| Linux x64    | [Download](https://github.com/autumngmod/gm_maskfs/releases/latest/download/gmsv_gm_maskfs_linux64.dll) |
+| Windows x32  | [Download](https://github.com/autumngmod/gm_maskfs/releases/latest/download/gmsv_maskfs_win32.dll) |
+| Windows x64  | [Download](https://github.com/autumngmod/gm_maskfs/releases/latest/download/gmsv_maskfs_win64.dll) |
+| Linux x32    | [Download](https://github.com/autumngmod/gm_maskfs/releases/latest/download/gmsv_maskfs_linux.dll) |
+| Linux x64    | [Download](https://github.com/autumngmod/gm_maskfs/releases/latest/download/gmsv_maskfs_linux64.dll) |
 
 ## 🚀 Usage
 
